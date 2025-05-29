@@ -2,6 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 
@@ -21,8 +22,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 
 import { authClient } from "@/lib/auth.client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -60,10 +61,33 @@ const SignupView = () => {
         email: data.email,
         password: data.password,
         name: data.name,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
           router.push("/");
+
+          setPending(false);
+        },
+        onError: ({ error }) => {
+          setError(error.message);
+          setPending(false);
+        },
+      }
+    );
+  };
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setPending(true);
+
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
           setPending(false);
         },
         onError: ({ error }) => {
@@ -190,7 +214,9 @@ const SignupView = () => {
                     variant={"outline"}
                     type="button"
                     className="w-full"
+                    onClick={() => onSocial("google")}
                   >
+                    <FaGoogle />
                     Google
                   </Button>
                   <Button
@@ -198,7 +224,9 @@ const SignupView = () => {
                     variant={"outline"}
                     type="button"
                     className="w-full"
+                    onClick={() => onSocial("github")}
                   >
+                    <FaGithub />
                     Github
                   </Button>
                 </div>
@@ -206,10 +234,10 @@ const SignupView = () => {
                 <div className="text-center text-sm">
                   Already have an account?{" "}
                   <Link
-                    href={"/sign-up"}
+                    href={"/sign-in"}
                     className="underline underline-offset-4"
                   >
-                    Sign up
+                    Sign in
                   </Link>
                 </div>
               </div>
