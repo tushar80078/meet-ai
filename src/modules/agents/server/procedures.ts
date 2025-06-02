@@ -1,13 +1,9 @@
 import { db } from "@/db";
 import { agents } from "@/db/schema";
-import {
-  createTRPCRouter,
-  baseProcedure,
-  protectedProcedure,
-} from "@/trpc/init";
+import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { agentsInsertSchema } from "../schema";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns, sql } from "drizzle-orm";
 
 export const agentsRouter = createTRPCRouter({
   getOne: protectedProcedure
@@ -18,7 +14,12 @@ export const agentsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const [existingAgent] = await db
-        .select()
+
+        .select({
+          ...getTableColumns(agents),
+          // TODO : CHange to original count
+          meetingCount: sql<number>`5`,
+        })
         .from(agents)
         .where(eq(agents.id, input.id));
 
