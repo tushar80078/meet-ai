@@ -21,7 +21,7 @@ const NewAMeetingDialog = ({ onOpenChange, open }: NewAgentDialogProps) => {
           onOpenChange(false);
           router.push(`meetings/${id}`);
         }}
-        onCancel={() => onOpenChange}
+        onCancel={() => onOpenChange(false)}
       />
     </ResponseDialog>
   );
