@@ -40,6 +40,7 @@ const CommandSelect = ({
   const selectedOption = options.find((option) => option.value === value);
 
   const handleOpenChange = (open: boolean) => {
+    console.log('open', open)
     onSearch?.("");
     setOpen(open);
   };
