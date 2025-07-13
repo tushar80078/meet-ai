@@ -23,4 +23,5 @@ export const auth = betterAuth({
       ...schema,
     },
   }),
+  trustedOrigins: ["https://epic-noted-buck.ngrok-free.app"],
 });
