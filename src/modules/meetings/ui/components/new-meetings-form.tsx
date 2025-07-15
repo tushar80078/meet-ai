@@ -1,6 +1,6 @@
 import { useTRPC } from "@/trpc/client";
 import { MeetingsGetOne } from "../../types";
-// import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,7 +38,7 @@ const MeetingForm = ({
   onSuccess,
 }: MeetingFormProp) => {
   const trpc = useTRPC();
-  // const rotuer = useRouter();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [agentSearch, setAgentSearch] = useState("");
@@ -57,15 +57,17 @@ const MeetingForm = ({
         await queryClient.invalidateQueries(
           trpc.meetings.getMany.queryOptions({})
         );
-
-        // TODO : invalidate free tier usage
+        await queryClient.invalidateQueries(
+          trpc.premium.getFreeUsage.queryOptions()
+        );
 
         onSuccess?.(data.id);
       },
       onError: (error) => {
         toast.error(error.message);
-
-        // TODO: Check if error code is FORBIDDEN redirect it
+        if (error.data?.code === "FORBIDDEN") {
+          router.push("/upgrade");
+        }
       },
     })
   );
@@ -85,8 +87,6 @@ const MeetingForm = ({
       },
       onError: (error) => {
         toast.error(error.message);
-
-        // TODO: Check if error code is FORBIDDEN redirect it
       },
     })
   );
